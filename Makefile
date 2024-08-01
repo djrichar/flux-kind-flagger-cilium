@@ -66,7 +66,7 @@ cilium_version_number = $(shell $(cilium_cli_location) version --client | grep "
 pre-check: # validate required tools
 	### Checking installed tooling
 	# Podman
-	podman -v
+	# podman -v
 	#
 	# Kubectl ($(kubectl_location))
 	@$(kubectl_location) version --client=true --output=json | jq -r '"kubectl version "+ .clientVersion.gitVersion'
@@ -85,7 +85,7 @@ pre-check: # validate required tools
 check: pre-check # validate prerequisites
 	### Checking prerequisites
 	# Kube Context
-	@$(kubectl_location) cluster-info --context kind-$(cluster_name) | grep 127.0.0.1
+	# @$(kubectl_location) cluster-info --context kind-$(cluster_name) | grep 127.0.0.1
 	@test -n "$(cilium_version_number)"
 	# Cilium version set ✓
 	#
@@ -123,9 +123,9 @@ prepare: # install prerequisites
 .PHONY: new
 new: # create fresh kind cluster
 	# Creating kind cluster named '$(cluster_name)'
-	@$(kind_cmd) create cluster -n $(cluster_name) --config .kind/config.yaml --image $(kindest_node_image)
-	@$(kind_cmd) export kubeconfig -n $(cluster_name) --kubeconfig ${HOME}/.kube/config
-
+	# @$(kind_cmd) create cluster -n $(cluster_name) --config .kind/config.yaml --image $(kindest_node_image)
+	# @$(kind_cmd) export kubeconfig -n $(cluster_name) --kubeconfig ${HOME}/.kube/config
+	## 
 	# Install Gateway API CRD
 	@$(kubectl_location) apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/$(gatway_api_version)/experimental-install.yaml
 
@@ -143,19 +143,19 @@ new: # create fresh kind cluster
 	@$(kubectl_location) rollout status --timeout=$(wait_timeout) deployment -n metallb-system controller
 	@$(kubectl_location) rollout status --timeout=$(wait_timeout) daemonset -n metallb-system speaker
 
-	$(eval lb_ip_range := $(shell podman network inspect kind | jq -r '.[] | select(.name == "kind") | .subnets[] | select(.gateway | test("^[0-9]+.[0-9]+.[0-9]+.[0-9]+$$")) | .gateway' | sed 's#0.1#0.240/28#'))
-	# Setting MetalLB address-pool range to $(lb_ip_range)
-	@sed -i "s#addresses:.*#addresses: [\"$(lb_ip_range)\"]#" .kind/metallb/ip-address-pool.yaml
-	@$(kubectl_location) apply -f .kind/metallb/ip-address-pool.yaml
+	# # $(eval lb_ip_range := $(shell podman network inspect kind | jq -r '.[] | select(.name == "kind") | .subnets[] | select(.gateway | test("^[0-9]+.[0-9]+.[0-9]+.[0-9]+$$")) | .gateway' | sed 's#0.1#0.240/28#'))
+	# # Setting MetalLB address-pool range to $(lb_ip_range)
+	# @sed -i "s#addresses:.*#addresses: [\"$(lb_ip_range)\"]#" .kind/metallb/ip-address-pool.yaml
+	# @$(kubectl_location) apply -f .kind/metallb/ip-address-pool.yaml
 
 .PHONY: kube-ctx
 kube-ctx: # create fresh kind cluster
-	@$(kind_cmd) export kubeconfig -n $(cluster_name) --kubeconfig ${HOME}/.kube/config
+	# @$(kind_cmd) export kubeconfig -n $(cluster_name) --kubeconfig ${HOME}/.kube/config
 
 .PHONY: clean
 clean: # remove kind cluster
 	# Removing kind cluster named '$(cluster_name)'
-	@$(kind_cmd) delete cluster -n $(cluster_name)
+	# @$(kind_cmd) delete cluster -n $(cluster_name)
 
 .PHONY: bootstrap
 bootstrap: check kube-ctx # install and configure flux
