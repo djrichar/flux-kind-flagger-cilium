@@ -8,6 +8,7 @@ resources:
 - service.yaml
 - hpa.yaml
 - servicemonitor.yaml
+- networkpolicy.yaml
 
 - canary.yaml
 # HttpRoute is created by Flagger if Canary is configured
