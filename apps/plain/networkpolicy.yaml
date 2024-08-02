@@ -4,6 +4,7 @@ apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
   name: "l7-visibility"
+  namespace: plain
 spec:
   endpointSelector:
     matchLabels:
